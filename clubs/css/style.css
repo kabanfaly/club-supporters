@@ -1,0 +1,119 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 27 sept. 2013, 14:51:11
+    Author     : knfaly
+*/
+@import "dataTables/table.css";
+@import "dataTables/TableTools.css";
+@import "dataTables/table_jui.css";
+@import "dataTables/jquery.dataTables.css";
+@import "dataTables/jquery-ui-1.8.4.custom";
+@import "dataTables/TableTools_JUI.css";
+@import "jquery-ui.min.css";
+
+#dialog, #information {
+    font-family: "Trebuchet MS", "Helvetica", "Arial",  "Verdana", "sans-serif";
+
+}
+body { font-size: 62.5%; }
+label, input { display:block; }
+input.text { margin-bottom:12px; width:95%; padding: .4em; }
+fieldset { padding:0; border:0; margin-top:25px; }
+h1 { font-size: 1.2em; margin: .6em 0; }
+div#users-contain { width: 350px; margin: 20px 0; }
+div#users-contain table { margin: 1em 0; border-collapse: collapse; width: 100%; }
+div#users-contain table td, div#users-contain table th { border: 1px solid #eee; padding: .6em 10px; text-align: left; }
+.ui-dialog .ui-state-error { padding: .3em; }
+.validateTips { border: 1px solid transparent; padding: 0.3em; } 
+
+.custom-combobox {
+    position: relative;
+    display: inline-block;
+}
+.custom-combobox-toggle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin-left: -1px;
+    padding: 0;
+    /* support: IE7 */
+    *height: 1.7em;
+    *top: 0.1em;
+}
+.custom-combobox-input {
+    margin: 0;
+    padding: 0.3em;
+}
+
+
+
+
+#clubsContent{font: bold 12px/32px Helvetica,Sans-Serif; width: 70%;}
+
+#dynamic{float: left; }
+.odd, .even{height:13px;}
+
+.filter{margin: 2px;}
+
+#content{margin-bottom: 5px;}
+
+/*.DataTables_sort_wrapper{color:white;}*/
+
+#clubsContent td{
+    border: 1px dashed #CCCCCC;
+}
+
+#slider{
+    display:none;
+}
+
+h1 .extraTitle{
+    color: #222222;
+    text-transform:uppercase;
+}
+
+#clubs tr{
+    cursor: pointer;
+}
+
+#information{    
+    margin-top: 30px;
+    float: right;
+    position: relative;
+    width: 250px;
+    font-size: 11px;
+    background-color: #D3D6FF;
+    border-radius:15px;
+
+}
+#information button{
+    float: right;
+}
+span.label{
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-right: 5px;
+}
+#information div{
+    margin: 0 0 10px 10px;
+}
+
+#infoHeader{
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+    background-color: #CCCCCC;
+    border-radius:25px;
+    margin:0px;
+    display: block;
+
+}
+#information textarea{
+    max-width: 250px;
+    min-height: 150px;
+}
