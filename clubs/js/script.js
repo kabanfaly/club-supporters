@@ -10,6 +10,23 @@ function changeClub() {
     xajax_changeClubFootball(idPays, idClubF);
 }
 
+function saveClubSupporter(idCS) {
+    var content = new Object();
+    content.nom = $(':input[name=nom]').val();
+    content.site = $(':input[name=site]').val();
+    content.telephone = $(':input[name=telephone]').val();
+    content.fax = $(':input[name=fax]').val();
+    content.Email = $(':input[name=Email]').val();
+    content.adresse = $(':input[name=adresse]').val();
+    content.code_postal = $(':input[name=code_postal]').val();
+    content.autres_informations = $(':input[name=autres_informations]').val();
+    
+    var contentFilter = ['nom', 'site', 'telephone', 'fax', 'Email', 'adresse', 'code_postal', 'autres_informations'];
+        
+    var jsonText = JSON.stringify(content, contentFilter, "\t");
+    console.log(jsonText);
+    xajax_saveClubSupporter(idCS, jsonText);
+}
 /**
  * Close an opened popin
  */
@@ -205,7 +222,7 @@ $(document).ready(function() {
     $('body').append('<div id="dialogContainer">' +
             //  '<div id="dialog"></div>' +
             '<div>');
-     
+
 });
 
 $(window).load(function() {

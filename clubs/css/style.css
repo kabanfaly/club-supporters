@@ -11,7 +11,7 @@ and open the template in the editor.
 @import "dataTables/TableTools.css";
 @import "dataTables/table_jui.css";
 @import "dataTables/jquery.dataTables.css";
-@import "dataTables/jquery-ui-1.8.4.custom";
+/*@import "dataTables/jquery-ui-1.8.4.custom";*/
 @import "dataTables/TableTools_JUI.css";
 @import "jquery-ui.min.css";
 
@@ -87,11 +87,14 @@ h1 .extraTitle{
     width: 250px;
     font-size: 11px;
     background-color: #D3D6FF;
-    border-radius:15px;
+    border-radius:5px;
 
 }
-#information button{
+#cancel{
     float: right;
+}
+#edit{
+    float: left;
 }
 span.label{
     font-size: 11px;
@@ -116,4 +119,7 @@ span.label{
 #information textarea{
     max-width: 250px;
     min-height: 150px;
+}
+.tfont{
+    color: white !important;
 }

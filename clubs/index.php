@@ -27,14 +27,14 @@ if ($user)
     </head>
 
     <body>
-        <h1><span class="extraTitle">Clubs de supporters</span></h1><br>
+        <h1><span class="extraTitle tfont">Clubs de supporters</span></h1><br>
     <center><div id="wait"></div></center>
     <div id="principal">
         <div id="clubsContent">
             <?php
             $queryPays = "select * from pays";
             $stm = $connection->prepare($queryPays);
-            echo '<span><span>Pays:</span>&nbsp;<select name="pays" id="pays" onchange="changePays();">';
+            echo '<span><span class="tfont">Pays:</span>&nbsp;<select name="pays" id="pays" onchange="changePays();">';
             echo '<option value="0">Tous les pays</option>';
             if ($stm && $stm->execute())
             {
@@ -46,7 +46,7 @@ if ($user)
             echo '</select></span>&nbsp;&nbsp;';
             $queryFC = "select * from club_football";
             $stm2 = $connection->prepare($queryFC);
-            echo '<span><span>Club de football:</span>&nbsp;<select name="clubF" id="clubF" onchange="changeClub()">';
+            echo '<span id="filterFC"><span class="tfont">Club de football:</span>&nbsp;<select name="clubF" id="clubF" onchange="changeClub()">';
             echo '<option value="0">Tous les clubs</option>';
             if ($stm2 && $stm2->execute())
             {
@@ -92,7 +92,7 @@ if ($user)
                     {
                         $msg = "$num club de supporters";
                     }
-                    echo $msg;
+                    echo '<span id="msgNbClubs" class="tfont">'.$msg.'</span>';
                     echo tableFooter();
                     ?>
 

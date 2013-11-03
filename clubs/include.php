@@ -1,7 +1,7 @@
 <?php
 
 $login = 'root';
-$pwd = 'kabamysql';
+$pwd = '';
 $dns = 'mysql:host=localhost;dbname=supporters';
 $connection = null;
 if (!defined('CONNECTION')) {

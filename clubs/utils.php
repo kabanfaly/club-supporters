@@ -7,7 +7,7 @@ $xajax = new xajax();
 
 $xajax->registerFunction("changePays");
 $xajax->registerFunction("changeClubFootball");
-$xajax->registerFunction("editClub");
+$xajax->registerFunction("saveClubSupporter");
 $xajax->registerFunction("getCSInfo");
 $xajax->registerFunction("getClubSupporter");
 $xajax->registerFunction("addClub");
@@ -34,7 +34,6 @@ if (!defined('NOTE_INFO'))
             </div>');
 }
 
-
 /**
  * Loads all displays all football clubs for a selected country
  * @param type $idPays
@@ -54,7 +53,7 @@ function changePays($idPays)
 
     $stm = $GLOBALS['connection']->prepare($query);
 
-    $result = '<span>Club de football:</span>&nbsp;<select name="clubF" id="clubF" onchange="changeClub()">';
+    $result = '<span class="tfont">Club de football:</span>&nbsp;<select name="clubF" id="clubF" onchange="changeClub()">';
     $result .= '<option value="0">Tous les clubs</option>';
     if ($stm && $stm->execute())
     {
@@ -154,7 +153,7 @@ function changeClubFootball($idPays, $idClubF)
         {
             $msg = "$num club de supporters";
         }
-        $response->script("$('#dynamic').prepend('<span id=\"msgNbClubs\">$msg</span>')");
+        $response->script("$('#dynamic').prepend('<span id=\"msgNbClubs\" class=\"tfont\">$msg</span>')");
         $response->includeScript('js/jquery.min.js');
         $response->includeScript('js/jquery-ui.min.js');
         $response->includeScript('js/dataTables/jquery.dataTables.min.js');
@@ -163,11 +162,33 @@ function changeClubFootball($idPays, $idClubF)
     return $response;
 }
 
-function editClub($id_cs, $dialog)
+/**
+ * Save or update a fan club
+ * @param int $id_cs fan club id
+ * @param array $content content to save or to update
+ * @return \xajaxResponse
+ */
+function saveClubSupporter($id_cs, $jsonContent)
 {
+    $content = json_decode($jsonContent, true);
     $response = new xajaxResponse();
-
-
+    if (empty($id_cs))
+    {// if save
+    } else
+    {
+        $queries = array();
+        foreach ($content as $key => $value)
+        {
+            $queries[] = "`$key` = '" . htmlspecialchars($value, ENT_QUOTES) . "'";
+        }
+        $query = "update club_supporter set " . implode(',', $queries) . " where idclub_supporter = $id_cs;";
+        $sth = $GLOBALS['connection']->prepare($query);
+        $response->alert($query);
+        if ($sth && $sth->execute())
+        {            
+            $response->script('xajax_getCSInfo(' . $id_cs . ');');
+        }
+    }
     return $response;
 }
 
@@ -181,8 +202,8 @@ function getCSInfo($id_cs)
     $response = new xajaxResponse();
 
     $query = "select * from club_supporter where idclub_supporter = $id_cs;";
-    
-     $query = "select p.nom as Pays, cf.nom as 'Club de football',  cs.* "
+
+    $query = "select p.nom as Pays, cf.nom as 'Club de football',  cs.* "
             . "from pays p inner join club_football cf on p.idpays = cf.idpays inner join club_supporter cs on cs.idclub_football = cf.idclub_football where idclub_supporter = $id_cs;";
 
     $sth = $GLOBALS['connection']->prepare($query);
@@ -194,8 +215,8 @@ function getCSInfo($id_cs)
         $res = $sth->fetch(PDO::FETCH_ASSOC);
         $content .= '<span id="infoHeader"><center>Informations détaillées</center></span><br>
                   <div><span class="label">Club de supporter:</span>' . utf8_encode($res['nom']) . '</div>
-                  <div><span class="label">Club de football:</span>' . utf8_encode($res['Club de football']) . ' - <i>'.utf8_encode($res['Pays']).' </i></div>
-                  <div><span class="label">Pays:</span>'.utf8_encode($res['Pays']).' </div>
+                  <div><span class="label">Club de football:</span>' . utf8_encode($res['Club de football']) . ' - <i>' . utf8_encode($res['Pays']) . ' </i></div>
+                  <div><span class="label">Pays:</span>' . utf8_encode($res['Pays']) . ' </div>
                   <div><span class="label">Site internet:</span>' . $res['site'] . ' </div>
                   <div><span class="label">Téléphone:</span>' . $res['telephone'] . ' </div>
                   <div><span class="label">Fax:</span>' . $res['fax'] . '</div>
@@ -203,64 +224,103 @@ function getCSInfo($id_cs)
                   <div><span class="label">Adresse:</span>' . utf8_encode($res['adresse']) . '</div>
                   <div><span class="label">Code postal:</span>' . $res['code_postal'] . '</div>
                   <div><span class="label">Informations supplémentaires:</span>' . utf8_encode($res['autres_informations']) . '</div>';
-        if ($_SESSION['current_user'] != NULL)
-        {
-            $content .= '<span><button onclick="xajax_getClubSupporter(' . $id_cs . ');">Modifier</button></span>';
-        }
-
+        $content .= '<span><button onclick="xajax_getClubSupporter(' . $id_cs . ');">Modifier</button></span>';
         $response->assign('information', 'innerHTML', $content);
     }
 
     return $response;
 }
 
+/**
+ * Get and display a fans club in a form for edit
+ * Only empty fieds from database can be modified
+ * @param int $id_cs fans club id
+ * @return \xajaxResponse
+ */
 function getClubSupporter($id_cs)
 {
     $response = new xajaxResponse();
 
-    $query = "select * from club_supporter where idclub_supporter = $id_cs;";
+    if ($_SESSION['current_user'] != NULL)
+    {      
+        $query = "select * from club_supporter where idclub_supporter = $id_cs;";
 
-    $sth = $GLOBALS['connection']->prepare($query);
+        $sth = $GLOBALS['connection']->prepare($query);
 
-    $form = '';
-    if ($sth && $sth->execute())
-    {
+        $form = '';
+        if ($sth && $sth->execute())
+        {
 
-        $res = $sth->fetch(PDO::FETCH_ASSOC);
-        $form .= '<span id="infoHeader"><center>Modification de la fiche</center></span><br>
+            $res = $sth->fetch(PDO::FETCH_ASSOC);
+            $form .= '<span id="infoHeader"><center>Modification de la fiche</center></span><br>
             <div class="message"></div>
             <form>
                 <fieldset>
-                    <label for="nom">Nom:</label>
-                    <input type="text" name="nom" id="nom" value="' . utf8_encode($res['nom']) . '" required="true" class="text ui-widget-content ui-corner-all" />
-                    
-                    <label for="site">Site internet:</label>
-                    <input type="text" name="site" id="site" value="' . $res['site'] . '" class="text ui-widget-content ui-corner-all" />
-                    
-                    <label for="telephone">Téléphone:</label>
-                    <input type="text" name="telephone" id="telephone" value="' . $res['telephone'] . '" class="text ui-widget-content ui-corner-all" />
-                    
-                    <label for="fax">Fax:</label>
-                    <input type="text" name="fax" id="fax" value="' . $res['fax'] . '" class="text ui-widget-content ui-corner-all" />
-                    
-                    <label for="email">Email:</label>
-                    <input type="text" name="email" id="email" value="' . $res['email'] . '" class="text ui-widget-content ui-corner-all" />
-                    
-                    <label for="adresse">Adresse:</label>
-                    <input type="text" name="adresse" id="adresse" value="' . utf8_encode($res['adresse']) . '" class="text ui-widget-content ui-corner-all" />
-                    
-                    <label for="code_postal">Code postal:</label>
-                    <input type="text" name="code_postal" size="6" id="code_postal"  value="' . $res['code_postal'] . '" class="ui-widget-content ui-corner-all" />                    
-                    
-                    <label for="autres_informations">Informations supplémentaires:</label>
-                    <textarea name="autres_informations" id="autres_informations" class="text ui-widget-content ui-corner-all" >' . utf8_encode($res['autres_informations']) . '</textarea>
-                    <span><button onclick="return false;">Valider</button></span>    
+                    <label for="nom">Nom:</label>';
+
+            $form .= '<input type="text" name="nom" id="nom" value="' . utf8_encode($res['nom']) . '" disabled required="true" class="text ui-widget-content ui-corner-all" />';
+            $form .= '<label for="site">Site internet:</label>
+                    <input type="text" name="site" id="site" value="' . $res['site'] . '" ';
+            if (!empty($res['site']))
+            {
+                $form .= ' disabled ';
+            }
+            $form .= 'class="text ui-widget-content ui-corner-all" />';
+
+            $form .= '<label for="telephone">Téléphone:</label>
+                    <input type="text" name="telephone" id="telephone" value="' . $res['telephone'] . '"';
+            if (!empty($res['telephone']))
+            {
+                $form .= ' disabled ';
+            }
+            $form .= 'class="text ui-widget-content ui-corner-all" />';
+
+            $form .= '<label for="fax">Fax:</label>
+                    <input type="text" name="fax" id="fax" value="' . $res['fax'] . '" class="text ui-widget-content ui-corner-all" />';
+            if (!empty($res['fax']))
+            {
+                $form .= ' disabled ';
+            }
+            $form .= '<label for="email">Email:</label>
+                    <input type="text" name="email" id="email" value="' . $res['email'] . '"';
+            if (!empty($res['email']))
+            {
+                $form .= ' disabled ';
+            }
+            $form .= 'class="text ui-widget-content ui-corner-all" />';
+
+            $form .= '<label for="adresse">Adresse:</label>
+                    <input type="text" name="adresse" id="adresse" value="' . utf8_encode($res['adresse']) . '"';
+            if (!empty($res['adresse']))
+            {
+                $form .= ' disabled ';
+            }
+            $form .= 'class="text ui-widget-content ui-corner-all" />';
+
+            $form .= '<label for="code_postal">Code postal:</label>
+                    <input type="text" name="code_postal" size="6" id="code_postal"  value="' . $res['code_postal'] . '" ';
+            if (!empty($res['code_postal']))
+            {
+                $form .= ' disabled ';
+            }
+            $form .= 'class="text ui-widget-content ui-corner-all" />';
+
+            $form .= '<label for="autres_informations">Informations supplémentaires:</label>
+                    <textarea name="autres_informations" id="autres_informations" ';
+            if (!empty($res['autres_informations']))
+            {
+                $form .= ' disabled ';
+            }
+            $form .= 'class="text ui-widget-content ui-corner-all" >' . utf8_encode($res['autres_informations']) . '</textarea>
+                    <button id="edit" onclick="saveClubSupporter(' . $id_cs . ');return false;">Valider</button><button id="cancel" onclick="xajax_getCSInfo(' . $res['idclub_supporter'] . '); return false;">Annuler</button>
                 </fieldset>
             </form>';
 
-        $response->assign('information', 'innerHTML', $form);
+            $response->assign('information', 'innerHTML', $form);
+        }
+    }else{
+        $response->alert("Vous n'etes pas connecté");
     }
-
     return $response;
 }
 
