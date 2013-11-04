@@ -8,7 +8,8 @@ if ($user)
 {
     //Get Current connected user    
     $_SESSION['current_user'] = $user->user_login;
-}else{
+} else
+{
     $_SESSION['current_user'] = NULL;
 }
 ?>
@@ -92,15 +93,18 @@ if ($user)
                     {
                         $msg = "$num club de supporters";
                     }
-                    echo '<span id="msgNbClubs" class="tfont">'.$msg.'</span>';
+                    echo '<span id="msgNbClubs" class="tfont">' . $msg . '</span>';
                     echo tableFooter();
                     ?>
 
                 </div>
             </div>
         </div>
-        <div id="information">
-          <?php echo NOTE_INFO?>
+        <div id="side-box">
+            <div id="msg"></div>
+            <div id="information">
+                <?php echo NOTE_INFO ?>
+            </div>
         </div>
 
         <!-- <div id="dialog" title="Ajouter">

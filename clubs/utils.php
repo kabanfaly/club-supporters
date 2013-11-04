@@ -320,6 +320,7 @@ function getClubSupporter($id_cs)
         }
     }else{
         $response->alert("Vous n'etes pas connecté");
+        $response->assign('msg', 'innerHTML', '<a href="../wp_login.php">Veuillez vous connecter </a>');
     }
     return $response;
 }

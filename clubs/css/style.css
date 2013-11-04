@@ -79,8 +79,7 @@ h1 .extraTitle{
 #clubs tr{
     cursor: pointer;
 }
-
-#information{    
+#side-box{    
     margin-top: 30px;
     float: right;
     position: relative;
