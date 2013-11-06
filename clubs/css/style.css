@@ -122,3 +122,6 @@ span.label{
 .tfont{
     color: white !important;
 }
+#msg{
+    color: red;
+}

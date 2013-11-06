@@ -319,8 +319,8 @@ function getClubSupporter($id_cs)
             $response->assign('information', 'innerHTML', $form);
         }
     }else{
-        $response->alert("Vous n'etes pas connecté");
-        $response->assign('msg', 'innerHTML', '<a href="../wp_login.php">Veuillez vous connecter </a>');
+        $response->assign('msg', 'innerHTML', '<center>Vous devez être connecté pour effectuer'
+                . ' cette opération <br><a href="../wp-login.php" style="font-weight:bold;">Veuillez vous connecter ici</a></center>');
     }
     return $response;
 }
@@ -328,8 +328,6 @@ function getClubSupporter($id_cs)
 function addClub($dialog)
 {
     $response = new xajaxResponse();
-
-
     $response->assign($dialog, 'innerHTML', 'test');
     $response->alert('tot');
     return $response;
