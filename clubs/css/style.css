@@ -92,7 +92,7 @@ h1 .extraTitle{
 #cancel{
     float: right;
 }
-#edit{
+#editButton{
     float: left;
 }
 span.label{
@@ -123,5 +123,9 @@ span.label{
     color: white !important;
 }
 #msg{
+    color: red;
+}
+
+.empty{
     color: red;
 }
