@@ -177,13 +177,17 @@ function saveClubSupporter($id_cs, $jsonContent)
     } else
     {
         $queries = array();
+        
+        $query = "update club_supporter set ";
         foreach ($content as $key => $value)
         {
-            $queries[] = "`$key` = '" . htmlspecialchars($value, ENT_QUOTES) . "'";
+            $query .= "`$key` = '" . utf8_decode(htmlspecialchars(($value), ENT_QUOTES)) . "',";
         }
-        $query = "update club_supporter set " . implode(',', $queries) . " where idclub_supporter = $id_cs;";
+        $query = substr($query, 0, strlen($query) - 1);
+        
+        $query .= " where idclub_supporter = $id_cs;";
+        //$response->alert($query);
         $sth = $GLOBALS['connection']->prepare($query);
-        $response->alert($query);
         if ($sth && $sth->execute())
         {
             $response->script('xajax_getCSInfo(' . $id_cs . ');');
@@ -214,6 +218,7 @@ function getCSInfo($id_cs)
 
         $res = $sth->fetch(PDO::FETCH_ASSOC);
         $content .= '<span id="infoHeader"><center>Informations détaillées</center></span><br>
+                  <div id="msg"></div>
                   <div><span class="label">Club de supporter:</span>' . utf8_encode($res['nom']) . '</div>
                   <div><span class="label">Club de football:</span>' . utf8_encode($res['Club de football']) . ' - <i>' . utf8_encode($res['Pays']) . ' </i></div>
                   <div><span class="label">Pays:</span>' . utf8_encode($res['Pays']) . ' </div>';
@@ -257,13 +262,19 @@ function getClubSupporter($id_cs)
             $form .= '<span id="infoHeader"><center>Modification de la fiche</center></span><br>
             <div class="message"></div>
             <form id="edit">
-                <fieldset>
-                    <label for="nom">Nom:</label>';
+                <fieldset>';
 
-            $form .= '<input type="text" name="nom" id="nom" value="' . utf8_encode($res['nom']) . '" disabled required="true" class="text ui-widget-content ui-corner-all" />';
+            $form .= empty($res['nom']) ? '<label for="site" class="empty">Nom:</label>' : '<label for="site">Nom:</label>';
+            $form .= '<input type="text" name="nom" id="nom" value="' . utf8_encode($res['nom']) . '" ';
+            if (!empty($res['nom']) && $_SESSION['current_user'] !== 'admin')
+            {
+                $form .= ' disabled ';
+            }
+            $form .= 'class="text ui-widget-content ui-corner-all" />';
+
             $form .= empty($res['site']) ? '<label for="site" class="empty">Site internet:</label>' : '<label for="site">Site internet:</label>';
             $form .= '<input type="text" name="site" id="site" value="' . $res['site'] . '" ';
-            if (!empty($res['site']))
+            if (!empty($res['site']) && $_SESSION['current_user'] !== 'admin')
             {
                 $form .= ' disabled ';
             }
@@ -271,7 +282,7 @@ function getClubSupporter($id_cs)
 
             $form .= empty($res['telephone']) ? '<label for="telephone" class="empty">Téléphone:</label>' : '<label for="telephone">Téléphone:</label>';
             $form .= '<input type="text" name="telephone" id="telephone" value="' . $res['telephone'] . '"';
-            if (!empty($res['telephone']))
+            if (!empty($res['telephone']) && $_SESSION['current_user'] !== 'admin')
             {
                 $form .= ' disabled ';
             }
@@ -279,14 +290,14 @@ function getClubSupporter($id_cs)
 
             $form .= empty($res['fax']) ? '<label for="fax" class="empty">Fax:</label>' : '<label for="fax">Fax:</label>';
             $form .= '<input type="text" name="fax" id="fax" value="' . $res['fax'] . '" class="text ui-widget-content ui-corner-all" />';
-            if (!empty($res['fax']))
+            if (!empty($res['fax']) && $_SESSION['current_user'] !== 'admin')
             {
                 $form .= ' disabled ';
             }
 
             $form .= empty($res['email']) ? '<label for="email" class="empty">Email:</label>' : '<label for="email">Email:</label>';
             $form .= '<input type="text" name="email" id="email" value="' . $res['email'] . '"';
-            if (!empty($res['email']))
+            if (!empty($res['email']) && $_SESSION['current_user'] !== 'admin')
             {
                 $form .= ' disabled ';
             }
@@ -294,16 +305,17 @@ function getClubSupporter($id_cs)
 
 
             $form .= empty($res['adresse']) ? '<label for="adresse" class="empty">Adresse:</label>' : '<label for="adresse">Adresse:</label>';
-            $form .= '<input type="text" name="adresse" id="adresse" value="' . utf8_encode($res['adresse']) . '"';
-            if (!empty($res['adresse']))
+            $form .= '<textarea name="adresse" id="adresse" style=" min-height: 50px;"';
+            if (!empty($res['adresse']) && $_SESSION['current_user'] !== 'admin')
             {
                 $form .= ' disabled ';
             }
-            $form .= 'class="text ui-widget-content ui-corner-all" />';
+
+            $form .= 'class="text ui-widget-content ui-corner-all" >' . utf8_encode($res['adresse']) . '</textarea>';
 
             $form .= empty($res['code_postal']) ? '<label for="code_postal" class="empty">Code postal:</label>' : '<label for="code_postal">Code postal:</label>';
             $form .= '<input type="text" name="code_postal" size="6" id="code_postal"  value="' . $res['code_postal'] . '" ';
-            if (!empty($res['code_postal']))
+            if (!empty($res['code_postal']) && $_SESSION['current_user'] !== 'admin')
             {
                 $form .= ' disabled ';
             }
@@ -311,7 +323,7 @@ function getClubSupporter($id_cs)
 
             $form .= empty($res['autres_informations']) ? '<label for="autres_informations" class="empty">Informations supplémentaires:</label>' : '<label for="autres_informations">Informations supplémentaires:</label>';
             $form .= '<textarea name="autres_informations" id="autres_informations" ';
-            if (!empty($res['autres_informations']))
+            if (!empty($res['autres_informations']) && $_SESSION['current_user'] !== 'admin')
             {
                 $form .= ' disabled ';
             }
@@ -334,7 +346,6 @@ function addClub($dialog)
 {
     $response = new xajaxResponse();
     $response->assign($dialog, 'innerHTML', 'test');
-    $response->alert('tot');
     return $response;
 }
 

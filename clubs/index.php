@@ -100,8 +100,7 @@ if ($user)
                 </div>
             </div>
         </div>
-        <div id="side-box">
-            <div id="msg"></div>
+        <div id="side-box">            
             <div id="information">
                 <?php echo NOTE_INFO ?>
             </div>

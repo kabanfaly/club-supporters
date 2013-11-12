@@ -10,6 +10,9 @@ include './include.php';
 $connection->exec('SET NAMES utf8;');
 
 $f = fopen('club_supporter.sql', 'r');
+if($f === false){
+    throw new Exception('club_supporter.sql doesn\'t exist', $code, $previous);
+}
 $query = '';
 while (!feof($f))
 {
